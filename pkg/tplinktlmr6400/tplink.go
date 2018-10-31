@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	errSessionHashNotFound = errors.New("session hash not found")
+	errSessionHashNotFound         = errors.New("session hash not found")
+	errRestartConfirmationNotFound = errors.New("restart confirmation not found")
 )
 
 var httpClient = &http.Client{}
@@ -44,8 +45,22 @@ func (r *tplink) Reboot(conf mrtypes.Config) error {
 
 	attachAuthorizationCookie(req, conf)
 
-	_, err = httpClient.Do(req)
-	return err
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if !findRestartConfirmationFromResponse(string(body)) {
+		return errRestartConfirmationNotFound
+	}
+
+	return nil
 }
 
 func tryLogin(conf mrtypes.Config) (string, error) {
@@ -79,6 +94,10 @@ func findSessionHashFromLoginResponse(body string) (string, error) {
 	}
 
 	return matches[1], nil
+}
+
+func findRestartConfirmationFromResponse(body string) bool {
+	return strings.Contains(body, "Restarting...") && strings.Contains(body, "Please wait a moment")
 }
 
 func fuckUpAuthorizationCookie(username string, password string) string {

@@ -28,3 +28,11 @@ func TestEndpoints(t *testing.T) {
 
 	assert.EqualString(t, rebootEndpoint("ISAQWMDBPYGLRYQC", cfg), "http://192.168.1.1/ISAQWMDBPYGLRYQC/userRpm/SysRebootRpm.htm?Reboot=Reboot")
 }
+
+func TestFindRestartConfirmationFromResponse(t *testing.T) {
+	correctBody := "<TR>\n<TD class=h2 id=\"t_restart\">Restarting...</TD>\n</TR>\n<TR><TD class = \"h2\" id =\"t_notice\" style=\"display:none\">Please wait a moment, if the browser ..."
+	assert.True(t, findRestartConfirmationFromResponse(correctBody) == true)
+
+	incorrectBody := "<TR>\n<TD class=h2 id=\"t_restart\">Restarting...</TD>\n</TR>\n<TR><TD class = \"h2\" id =\"t_notice\" style=\"display:none\">Please wait a m0ment, if the browser ..."
+	assert.True(t, findRestartConfirmationFromResponse(incorrectBody) == false)
+}
