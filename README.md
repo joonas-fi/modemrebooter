@@ -13,6 +13,9 @@ modems) with hardware (smart plug perhaps), and it'd probably be a lot more robu
 if the internet is down and somehow the modem admin panel is also stuck so we cannot
 reboot via software?
 
+Anyway, pure-software approach worked for me, but smartplug (or custom hardware) support
+could be developed as a plugin in the future.
+
 
 Usage
 -----
@@ -20,10 +23,16 @@ Usage
 Download binary for your OS/architecture (works for Raspberry Pi as well) combo from the
 download link.
 
-Configure it to automatically start at boot:
+Write a `config.json` file (see [config.example.json](config.example.json)).
+
+Configure it to automatically start at boot (you might need to run it with sudo):
 
 ```
-$ TODO
+$ ./modemrebooter write-systemd-unit-file
+Wrote unit file to /etc/systemd/system/modemrebooter.service
+Run to enable on boot & to start now:
+        $ systemctl enable modemrebooter
+        $ systemctl start modemrebooter
 ```
 
 
@@ -32,7 +41,7 @@ Supported garbage
 
 This application has "plugins" for different types of modems, currently:
 
-| Model                                  | Code                     |
+| Model                                  | Plugin ID                |
 |----------------------------------------|--------------------------|
 | TP-Link TL-MR6400 garbage              | tplinktlmr6400           |
 

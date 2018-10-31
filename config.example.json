@@ -1,0 +1,6 @@
+{
+	"type": "tplinktlmr6400",
+	"address": "http://192.168.1.1",
+	"admin_username": "admin",
+	"admin_password": "hunter2"
+}
