@@ -1,6 +1,7 @@
 package tplinktlmr6400
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/base64"
 	"errors"
@@ -24,7 +25,7 @@ func New() mrtypes.ModemRebooter { return &tplink{} }
 
 type tplink struct{}
 
-func (r *tplink) Reboot(conf mrtypes.Config) error {
+func (r *tplink) Reboot(_ context.Context, conf mrtypes.Config) error {
 	sessionHash, err := tryLogin(conf)
 	if err != nil {
 		// login fails sometimes, but works on 2nd try (because why not)

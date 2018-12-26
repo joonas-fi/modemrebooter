@@ -1,11 +1,12 @@
 package mrtypes
 
 import (
+	"context"
 	"time"
 )
 
 type ModemRebooter interface {
-	Reboot(conf Config) error
+	Reboot(ctx context.Context, conf Config) error
 }
 
 type Config struct {

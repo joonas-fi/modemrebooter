@@ -13,10 +13,7 @@ func New() mrtypes.ModemRebooter { return &zyxel{} }
 
 type zyxel struct{}
 
-func (r *zyxel) Reboot(conf mrtypes.Config) error {
-	ctx, cancel := context.WithTimeout(context.TODO(), ezhttp.DefaultTimeout10s)
-	defer cancel()
-
+func (r *zyxel) Reboot(ctx context.Context, conf mrtypes.Config) error {
 	_, err := ezhttp.Get(
 		ctx,
 		conf.Address+"/cgi-bin/Reboot",

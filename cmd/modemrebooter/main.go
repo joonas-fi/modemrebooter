@@ -62,13 +62,18 @@ func mainLoop(ctx context.Context, conf mrtypes.Config, logl *logex.Leveled) err
 		if state.ShouldReboot(defaultRebootConfig, time.Now()) {
 			logl.Info.Println("rebooting modem")
 
-			if err := rebooter.Reboot(conf); err != nil {
+			// modem reboot should succeed within 60 seconds
+			rebootCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
+
+			if err := rebooter.Reboot(rebootCtx, conf); err != nil {
 				logl.Error.Printf("reboot failed: %s", err.Error())
 			} else {
 				logl.Info.Println("reboot succeeded")
 
 				state = state.SuccesfullReboot(time.Now())
 			}
+
+			cancel()
 		}
 
 		select {
