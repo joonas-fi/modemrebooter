@@ -44,6 +44,7 @@ This application has "plugins" for different types of modems, currently:
 | Model                                  | Plugin ID                |
 |----------------------------------------|--------------------------|
 | TP-Link TL-MR6400 garbage              | tplinktlmr6400           |
+| ZyXEL VMG1312-B10D garbage             | zyxelvmg1312b10d         |
 
 
 How to build & develop

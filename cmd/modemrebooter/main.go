@@ -4,18 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/function61/gokit/logger"
+	"github.com/function61/gokit/dynversion"
+	"github.com/function61/gokit/logex"
 	"github.com/function61/gokit/ossignal"
 	"github.com/function61/gokit/systemdinstaller"
 	"github.com/joonas-fi/modemrebooter/pkg/internetupdetector"
 	"github.com/joonas-fi/modemrebooter/pkg/mrtypes"
 	"github.com/joonas-fi/modemrebooter/pkg/tplinktlmr6400"
+	"github.com/joonas-fi/modemrebooter/pkg/zyxelvmg1312b10d"
 	"github.com/spf13/cobra"
 	"os"
 	"time"
 )
-
-var version = "dev" // replaced dynamically at build time
 
 const (
 	tagline = "Reboots your modem if internet is down"
@@ -26,9 +26,7 @@ var defaultRebootConfig = mrtypes.RebootConfig{
 	ModemRecoversIn:    4 * time.Minute,
 }
 
-func mainLoop(ctx context.Context, conf mrtypes.Config) error {
-	log := logger.New("internet")
-
+func mainLoop(ctx context.Context, conf mrtypes.Config, logl *logex.Leveled) error {
 	rebooter, err := initRebooter(conf)
 	if err != nil {
 		return err
@@ -49,25 +47,25 @@ func mainLoop(ctx context.Context, conf mrtypes.Config) error {
 
 		if state.IsUpDifferentTo(previousState) {
 			if up {
-				log.Info("came back UP")
+				logl.Info.Println("came back UP")
 			} else {
-				log.Error("went DOWN")
+				logl.Error.Println("went DOWN")
 			}
 		}
 
 		if up {
-			log.Debug("up")
+			logl.Debug.Println("up")
 		} else {
-			log.Info(fmt.Sprintf("down for %s", time.Since(state.wentDownAt)))
+			logl.Info.Printf("down for %s", time.Since(state.wentDownAt))
 		}
 
 		if state.ShouldReboot(defaultRebootConfig, time.Now()) {
-			log.Info("rebooting modem")
+			logl.Info.Println("rebooting modem")
 
 			if err := rebooter.Reboot(conf); err != nil {
-				log.Error(fmt.Sprintf("reboot failed: %s", err.Error()))
+				logl.Error.Printf("reboot failed: %s", err.Error())
 			} else {
-				log.Info("reboot succeeded")
+				logl.Info.Println("reboot succeeded")
 
 				state = state.SuccesfullReboot(time.Now())
 			}
@@ -85,7 +83,7 @@ func main() {
 	app := &cobra.Command{
 		Use:     os.Args[0],
 		Short:   tagline,
-		Version: version,
+		Version: dynversion.Version,
 	}
 
 	app.AddCommand(&cobra.Command{
@@ -93,9 +91,12 @@ func main() {
 		Short: "Runs the program",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			log := logger.New("main")
-			log.Info(fmt.Sprintf("starting %s", version))
-			defer log.Info("stopped")
+			rootLogger := logex.StandardLogger()
+
+			mainLogger := logex.Levels(logex.Prefix("main", rootLogger))
+
+			mainLogger.Info.Printf("starting %s", dynversion.Version)
+			defer mainLogger.Info.Println("stopped")
 
 			conf, err := readConfig()
 			if err != nil {
@@ -104,11 +105,11 @@ func main() {
 
 			ctx, cancel := context.WithCancel(context.Background())
 			go func() {
-				log.Info(fmt.Sprintf("got %s; stopping", ossignal.WaitForInterruptOrTerminate()))
+				mainLogger.Info.Printf("got %s; stopping", <-ossignal.InterruptOrTerminate())
 				cancel()
 			}()
 
-			if err := mainLoop(ctx, *conf); err != nil {
+			if err := mainLoop(ctx, *conf, logex.Levels(logex.Prefix("internet", rootLogger))); err != nil {
 				panic(err)
 			}
 		},
@@ -157,6 +158,8 @@ func readConfig() (*mrtypes.Config, error) {
 
 func initRebooter(conf mrtypes.Config) (mrtypes.ModemRebooter, error) {
 	switch conf.Type {
+	case "zyxelvmg1312b10d":
+		return zyxelvmg1312b10d.New(), nil
 	case "tplinktlmr6400":
 		return tplinktlmr6400.New(), nil
 	default:

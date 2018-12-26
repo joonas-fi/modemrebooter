@@ -18,56 +18,56 @@ func TestState(t *testing.T) {
 	state = state.Up()
 
 	// base state is UP
-	assert.True(t, state.IsUpDifferentTo(state.Up()) == false)                          // up==up?
-	assert.True(t, state.IsUpDifferentTo(state.Down(midnight)) == true)                 // up==down?
-	assert.True(t, state.Down(midnight).IsUpDifferentTo(state) == true)                 // down==up?
-	assert.True(t, state.Down(midnight).IsUpDifferentTo(state.Down(midnight)) == false) // down==down?
+	assert.Assert(t, state.IsUpDifferentTo(state.Up()) == false)                          // up==up?
+	assert.Assert(t, state.IsUpDifferentTo(state.Down(midnight)) == true)                 // up==down?
+	assert.Assert(t, state.Down(midnight).IsUpDifferentTo(state) == true)                 // down==up?
+	assert.Assert(t, state.Down(midnight).IsUpDifferentTo(state.Down(midnight)) == false) // down==down?
 
-	assert.True(t, state.wentDownAt.IsZero())
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, midnight))
+	assert.Assert(t, state.wentDownAt.IsZero())
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, midnight))
 
 	state = state.Down(midnight)
 
-	assert.True(t, state.wentDownAt.Equal(midnight))
+	assert.Assert(t, state.wentDownAt.Equal(midnight))
 
 	// reboot should be only possible at 5 minute mark
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(1)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(2)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(3)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(4)))
-	assert.True(t, state.ShouldReboot(defaultRebootConfig, tplus(5)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(1)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(2)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(3)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(4)))
+	assert.Assert(t, state.ShouldReboot(defaultRebootConfig, tplus(5)))
 
 	// now reboot
 	state = state.SuccesfullReboot(tplus(5))
 
 	// internet keeps being down, but reboot is not possible until "modemRecoversIn"
 	// from last reboot
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(5)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(6)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(7)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(8)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(9)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(5)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(6)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(7)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(8)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(9)))
 
 	// another reboot after previous reboot
-	assert.True(t, state.ShouldReboot(defaultRebootConfig, tplus(10)))
+	assert.Assert(t, state.ShouldReboot(defaultRebootConfig, tplus(10)))
 
 	state = state.SuccesfullReboot(tplus(10))
 
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(10)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(11)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(10)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(11)))
 
 	// internet went back UP, woohoo!
 	state = state.Up()
 
 	// while we're up, should not reboot
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(11)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(12)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(40)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(11)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(12)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(40)))
 
 	// down again :(
 	state = state.Down(tplus(40))
 
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(40)))
-	assert.True(t, !state.ShouldReboot(defaultRebootConfig, tplus(41)))
-	assert.True(t, state.ShouldReboot(defaultRebootConfig, tplus(45)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(40)))
+	assert.Assert(t, !state.ShouldReboot(defaultRebootConfig, tplus(41)))
+	assert.Assert(t, state.ShouldReboot(defaultRebootConfig, tplus(45)))
 }

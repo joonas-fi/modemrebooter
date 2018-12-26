@@ -3,16 +3,18 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8c3566f2b150503714d5da521b4a50bedf268dfc4b15c6a9018362af3bd4cd1d"
+  digest = "1:efac4e576ce7c3846d0a2fe4bcb85a6732c79d606c454115dc79893e3daa71ca"
   name = "github.com/function61/gokit"
   packages = [
     "assert",
-    "logger",
+    "dynversion",
+    "ezhttp",
+    "logex",
     "ossignal",
     "systemdinstaller",
   ]
   pruneopts = "UT"
-  revision = "36d253189c89624e173f3a1bce852a481e64aa69"
+  revision = "087f55c7962779780ef9aa7b547047baa671bd68"
 
 [[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
@@ -43,7 +45,9 @@
   analyzer-version = 1
   input-imports = [
     "github.com/function61/gokit/assert",
-    "github.com/function61/gokit/logger",
+    "github.com/function61/gokit/dynversion",
+    "github.com/function61/gokit/ezhttp",
+    "github.com/function61/gokit/logex",
     "github.com/function61/gokit/ossignal",
     "github.com/function61/gokit/systemdinstaller",
     "github.com/spf13/cobra",
