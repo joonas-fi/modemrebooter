@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/function61/gokit/dynversion"
+	"github.com/function61/gokit/jsonfile"
 	"github.com/function61/gokit/logex"
 	"github.com/function61/gokit/ossignal"
 	"github.com/function61/gokit/systemdinstaller"
@@ -103,8 +103,8 @@ func main() {
 			mainLogger.Info.Printf("starting %s", dynversion.Version)
 			defer mainLogger.Info.Println("stopped")
 
-			conf, err := readConfig()
-			if err != nil {
+			conf := &mrtypes.Config{}
+			if err := jsonfile.Read("config.json", conf, true); err != nil {
 				panic(err)
 			}
 
@@ -141,24 +141,6 @@ func writeSystemdFileEntry() *cobra.Command {
 			fmt.Println(systemdHints)
 		},
 	}
-}
-
-func readConfig() (*mrtypes.Config, error) {
-	file, err := os.Open("config.json")
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	jsonDecoder := json.NewDecoder(file)
-	jsonDecoder.DisallowUnknownFields()
-
-	conf := &mrtypes.Config{}
-	if err := jsonDecoder.Decode(conf); err != nil {
-		return nil, err
-	}
-
-	return conf, nil
 }
 
 func initRebooter(conf mrtypes.Config) (mrtypes.ModemRebooter, error) {

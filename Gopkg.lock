@@ -3,12 +3,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:efac4e576ce7c3846d0a2fe4bcb85a6732c79d606c454115dc79893e3daa71ca"
+  digest = "1:aeb2c0610edadd4158152982f92ae31a8ee782a503a28777ea06c64b088f4d70"
   name = "github.com/function61/gokit"
   packages = [
     "assert",
     "dynversion",
     "ezhttp",
+    "jsonfile",
     "logex",
     "ossignal",
     "systemdinstaller",
@@ -47,6 +48,7 @@
     "github.com/function61/gokit/assert",
     "github.com/function61/gokit/dynversion",
     "github.com/function61/gokit/ezhttp",
+    "github.com/function61/gokit/jsonfile",
     "github.com/function61/gokit/logex",
     "github.com/function61/gokit/ossignal",
     "github.com/function61/gokit/systemdinstaller",
