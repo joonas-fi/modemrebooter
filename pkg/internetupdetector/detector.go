@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-// rationale for bypassing LAN DNS servers: to bypass caching
+// rationale for bypassing LAN DNS servers:
+// - to bypass caching
+// - to not report errors if DNS is down (internet != DNS)
 
 var (
 	primaryDetector   = newDetector("208.67.222.222:53") // documented at https://use.opendns.com/
