@@ -13,5 +13,10 @@
 				"dev": ["bash"]
 			}
 		}
-	]
+	],
+	"os_arches": {
+		"linux-amd64": true,
+		"linux-arm": true,
+		"windows-amd64": true
+	}
 }
