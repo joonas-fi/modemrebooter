@@ -1,5 +1,5 @@
 [![Build Status](https://img.shields.io/travis/joonas-fi/modemrebooter.svg?style=for-the-badge)](https://travis-ci.org/joonas-fi/modemrebooter)
-[![Download](https://img.shields.io/bintray/v/joonas/modemrebooter/main.svg?style=for-the-badge&label=Download)](https://bintray.com/joonas/modemrebooter/main/_latestVersion#files)
+[![Download](https://img.shields.io/bintray/v/joonas/dl/modemrebooter.svg?style=for-the-badge&label=Download)](https://bintray.com/joonas/dl/modemrebooter/_latestVersion#files)
 
 Sometimes modems just drop the internet connection in a way that the network comes back
 only after being restarted. This is because modems usually are piles or garbage made out
