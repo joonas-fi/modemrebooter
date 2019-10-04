@@ -3,10 +3,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:aeb2c0610edadd4158152982f92ae31a8ee782a503a28777ea06c64b088f4d70"
+  digest = "1:dcd9577a7c91d6b603e0716daec42a1c8799e11364ce4011145d087541d88c2c"
   name = "github.com/function61/gokit"
   packages = [
     "assert",
+    "atomicfilewrite",
     "dynversion",
     "ezhttp",
     "jsonfile",
@@ -15,7 +16,7 @@
     "systemdinstaller",
   ]
   pruneopts = "UT"
-  revision = "087f55c7962779780ef9aa7b547047baa671bd68"
+  revision = "cdd0c7fe9451203a91b76a8f9981d41add224cb4"
 
 [[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"

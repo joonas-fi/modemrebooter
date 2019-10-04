@@ -169,12 +169,17 @@ func writeSystemdFileEntry() *cobra.Command {
 		Short: "Install unit file to start this application on startup",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			systemdHints, err := systemdinstaller.InstallSystemdServiceFile("modemrebooter", []string{"run"}, tagline)
-			if err != nil {
+			service := systemdinstaller.SystemdServiceFile(
+				"modemrebooter",
+				tagline,
+				systemdinstaller.Args("run"),
+				systemdinstaller.Docs("https://github.com/joonas-fi/modemrebooter"))
+
+			if err := systemdinstaller.Install(service); err != nil {
 				panic(err)
 			}
 
-			fmt.Println(systemdHints)
+			fmt.Println(systemdinstaller.GetHints(service))
 		},
 	}
 }
