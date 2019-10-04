@@ -84,6 +84,50 @@ func mainLoop(ctx context.Context, conf mrtypes.Config, logl *logex.Leveled) err
 	}
 }
 
+func mainInternal() error {
+	rootLogger := logex.StandardLogger()
+
+	mainLogger := logex.Levels(logex.Prefix("main", rootLogger))
+
+	mainLogger.Info.Printf("starting %s", dynversion.Version)
+	defer mainLogger.Info.Println("stopped")
+
+	conf, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		defer cancel()
+		mainLogger.Info.Printf("got %s; stopping", <-ossignal.InterruptOrTerminate())
+	}()
+
+	if err := mainLoop(ctx, *conf, logex.Levels(logex.Prefix("internet", rootLogger))); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func runReboot() error {
+	conf, err := readConfig()
+	if err != nil {
+		return err
+	}
+
+	rebooter, err := initRebooter(*conf)
+	if err != nil {
+		return err
+	}
+
+	// modem reboot should succeed within 60 seconds
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	return rebooter.Reboot(ctx, *conf)
+}
+
 func main() {
 	app := &cobra.Command{
 		Use:     os.Args[0],
@@ -96,25 +140,17 @@ func main() {
 		Short: "Runs the program",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			rootLogger := logex.StandardLogger()
-
-			mainLogger := logex.Levels(logex.Prefix("main", rootLogger))
-
-			mainLogger.Info.Printf("starting %s", dynversion.Version)
-			defer mainLogger.Info.Println("stopped")
-
-			conf := &mrtypes.Config{}
-			if err := jsonfile.Read("config.json", conf, true); err != nil {
+			if err := mainInternal(); err != nil {
 				panic(err)
 			}
-
-			ctx, cancel := context.WithCancel(context.Background())
-			go func() {
-				mainLogger.Info.Printf("got %s; stopping", <-ossignal.InterruptOrTerminate())
-				cancel()
-			}()
-
-			if err := mainLoop(ctx, *conf, logex.Levels(logex.Prefix("internet", rootLogger))); err != nil {
+		},
+	})
+	app.AddCommand(&cobra.Command{
+		Use:   "reboot",
+		Short: "Just reboots the modem now",
+		Args:  cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := runReboot(); err != nil {
 				panic(err)
 			}
 		},
@@ -152,4 +188,9 @@ func initRebooter(conf mrtypes.Config) (mrtypes.ModemRebooter, error) {
 	default:
 		return nil, fmt.Errorf("unknown modem type: %s", conf.Type)
 	}
+}
+
+func readConfig() (*mrtypes.Config, error) {
+	conf := &mrtypes.Config{}
+	return conf, jsonfile.Read("config.json", conf, true)
 }
