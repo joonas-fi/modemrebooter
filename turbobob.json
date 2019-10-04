@@ -5,14 +5,13 @@
 	"builders": [
 		{
 			"name": "default",
-			"dockerfile_path": "build-default.Dockerfile",
+			"uses": "docker://fn61/buildkit-golang:20190316_0913_96b56b86",
 			"mount_destination": "/go/src/github.com/joonas-fi/modemrebooter",
-			"dev_command": [
-				"bash"
-			],
-			"dev_ports": [],
-			"pass_envs": ["BINTRAY_CREDS"],
-			"contextless_build": true
+			"workdir": "/go/src/github.com/joonas-fi/modemrebooter",
+			"commands": {
+				"build": ["bin/build.sh"],
+				"dev": ["bash"]
+			}
 		}
 	]
 }
